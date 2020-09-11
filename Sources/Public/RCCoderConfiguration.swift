@@ -24,12 +24,13 @@ import Foundation
 
 public struct RCCoderConfiguration {
   
-  public let version = Version.v1
+  public let version: Version
   public let maxMessageCount: Int
   public let bitesPerSymbol: Int
   public let characters: [Character]
   
-  public init(characters: String) {
+  public init(characters: String, version: Version = .v1) {
+    self.version = version
     var charactersArray = characters.map({$0})
     charactersArray.append(version.startingCharacter)
     charactersArray.append(contentsOf: version.emptyCharacters)
@@ -57,6 +58,7 @@ public struct RCCoderConfiguration {
 public extension RCCoderConfiguration {
   enum Version {
     case v1
+    case custom(Int)
 
     var maxBitesPerSection: Int {
       topLevelBitesCount + middleLevelBitesCount + bottomLevelBitesCount //should be multiple of 8
@@ -64,26 +66,29 @@ public extension RCCoderConfiguration {
     
     var topLevelBitesCount: Int {
       switch self {
-        case .v1: return 24
+        case .v1: return 16
+        case let .custom(value): return value
       }
     }
     
     var middleLevelBitesCount: Int {
       switch self {
-        case .v1: return 24
+        case .v1: return 16
+        case let .custom(value): return value
       }
     }
     
     var bottomLevelBitesCount: Int {
       switch self {
-        case .v1: return 24
+        case .v1: return 16
+        case let .custom(value): return value
       }
     }
     
     var parityTable: [UInt8] {
       switch self {
-        case .v1:
-        return [0x03, 0x65, 0xB9]
+        case .v1: return [0x03, 0x65, 0xB9]
+        case let .custom(value): return [0x03, 0x65, 0xB9]
       }
     }
     
