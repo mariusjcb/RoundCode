@@ -1,17 +1,13 @@
 //  MIT License
-
 //  Copyright (c) 2020 Haik Aslanyan
-
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
 //  in the Software without restriction, including without limitation the rights
 //  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 //  copies of the Software, and to permit persons to whom the Software is
 //  furnished to do so, subject to the following conditions:
-
 //  The above copyright notice and this permission notice shall be included in all
 //  copies or substantial portions of the Software.
-
 //  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 //  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 //  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -19,17 +15,17 @@
 //  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
-
 import Foundation
 
 public struct RCCoderConfiguration {
   
-  public let version = Version.v1
+  public let version: Version
   public let maxMessageCount: Int
   public let bitesPerSymbol: Int
   public let characters: [Character]
   
-  public init(characters: String) {
+  public init(characters: String, version: Version = .v1) {
+    self.version = version
     var charactersArray = characters.map({$0})
     charactersArray.append(version.startingCharacter)
     charactersArray.append(contentsOf: version.emptyCharacters)
@@ -57,6 +53,7 @@ public struct RCCoderConfiguration {
 public extension RCCoderConfiguration {
   enum Version {
     case v1
+    case custom(Int)
 
     var maxBitesPerSection: Int {
       topLevelBitesCount + middleLevelBitesCount + bottomLevelBitesCount //should be multiple of 8
@@ -64,26 +61,29 @@ public extension RCCoderConfiguration {
     
     var topLevelBitesCount: Int {
       switch self {
-        case .v1: return 24
+        case .v1: return 16
+        case let .custom(value): return value
       }
     }
     
     var middleLevelBitesCount: Int {
       switch self {
-        case .v1: return 24
+        case .v1: return 16
+        case let .custom(value): return value
       }
     }
     
     var bottomLevelBitesCount: Int {
       switch self {
-        case .v1: return 24
+        case .v1: return 16
+        case let .custom(value): return value
       }
     }
     
     var parityTable: [UInt8] {
       switch self {
-        case .v1:
-        return [0x03, 0x65, 0xB9]
+        case .v1: return [0x03, 0x65, 0xB9]
+        case let .custom(value): return [0x03, 0x65, 0xB9]
       }
     }
     
